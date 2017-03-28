@@ -1,4 +1,4 @@
-module ArithmeticOperatos where
+module ArithmeticOperators where
 
     -- Define all possible operations and make them showable
     data Op = Add | Mul | Sub | Div
