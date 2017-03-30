@@ -14,21 +14,23 @@ module ForceBruteSol where
     operators::[Op]
     operators = [Add, Mul, Sub, Div]
 
+    type Result = (Expr, Int)
+
     -- Calculate all possible operations
-    exprs::[Int] -> [Expr]
-    exprs [] = []
-    exprs [x] = [Val x]
-    exprs xs = [ e | (ls, rs)   <- split xs
-                        , x     <- exprs ls
-                        , y     <- exprs rs
+    results::[Int] -> [Result]
+    results [] = []
+    results [x] = [(Val x, x)]
+    results xs = [ e | (ls, rs) <- split xs
+                        , x     <- results ls
+                        , y     <- results rs
                         , e     <- combine x y
                         ]
 
     -- Combine 2 expressions with all possible operators
-    combine::Expr -> Expr -> [Expr]
-    combine x y = [ App o x y | o <- operators ]
+    combine::Result -> Result -> [Result]
+    combine (x, rx) (y, ry) = [ (App o x y, apply o rx ry) | o <- operators, valid o rx ry ]
 
 
     -- Returns all possible solutions
     solutions::Int -> [Int] -> [Expr]
-    solutions x xs = [ e | xs' <- choices xs, e <- exprs xs', eval e == [x]]
+    solutions x xs = [ e | xs' <- choices xs, (e,r) <- results xs', r == x ]
